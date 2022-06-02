@@ -1,0 +1,15 @@
+id
+ // bigInt usigned
+
+product_id
+ // bigInt usigned
+
+quantity 
+ // decimal(20,2) default 0.00
+
+price 
+ // decimal(20,2) default 0.00
+
+amount 
+ // decimal(20,2) default 0.00
+

@@ -1,0 +1,17 @@
+id 
+ // bigInt usigned
+  
+code 
+ // string 50
+
+nama
+ // string 50
+
+email
+ // string 50 unique
+
+created_at
+ // timestamp
+
+updated_at 
+ // timestamp

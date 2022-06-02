@@ -1,0 +1,5 @@
+id  
+  //  bigInt usigned 
+
+name 
+  // string 50

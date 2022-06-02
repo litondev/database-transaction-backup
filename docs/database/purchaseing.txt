@@ -1,0 +1,17 @@
+id 
+  // bigInt unsigned
+
+code 
+ // stirng 50
+
+supplier_id 
+  // bigInt usigned 
+
+user_id 
+  // bigInt usigned 
+
+total
+ // decimal(20,2) default 0.00
+
+grand_total
+ // decimal(20,2) default 0.00

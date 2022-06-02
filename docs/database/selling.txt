@@ -1,0 +1,20 @@
+id 
+  // bigInt unsigned
+
+code 
+ // stirng 50
+
+customer_id 
+  // bigInt usigned 
+
+user_id 
+  // bigInt usigned 
+
+warehouse_id 
+  // bigInt usigned
+
+total
+ // decimal(20,2) default 0.00
+
+grand_total
+ // decimal(20,2) default 0.00
