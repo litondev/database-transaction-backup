@@ -1,0 +1,8 @@
+id 
+ // bigInt usigned
+  
+code 
+ // string 50
+
+nama
+ // string 50

@@ -12,6 +12,3 @@ user_id
 
 total
  // decimal(20,2) default 0.00
-
-grand_total
- // decimal(20,2) default 0.00

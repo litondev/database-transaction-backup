@@ -1,6 +1,9 @@
 id
  // bigInt usigned
 
+purchsaeing_id 
+ // bigInt unsigned
+ 
 product_id
  // bigInt usigned
 
