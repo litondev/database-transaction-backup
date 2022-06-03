@@ -102,7 +102,6 @@ try{
             supplier_id int DEFAULT NULL,
             user_id int DEFAULT NULL,
             total DECIMAL(20,2) DEFAULT 0.00,
-            grand_total DECIMAL(20,2) DEFAULT 0.00,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             deleted_at TIMESTAMP NULL
@@ -125,7 +124,45 @@ try{
               amount DECIMAL(20,2) DEFAULT 0.00
           );`,
         }
-      }
+      },
+
+      {
+        "table" : "sellings",
+        "fields" : ["code","customer_id","user_id","total","warehouse_id"],    
+        "datas" : [
+          ["SG-1",1,1,10000,1],                 
+          ["SG-2",2,2,20000,1]
+        ],
+        "sqlTable" : `CREATE TABLE sellings (
+            id int NOT NULL AUTO_INCREMENT PRIMARY KEY,
+            code varchar(50) NOT NULL UNIQUE,
+            customer_id int DEFAULT NULL,
+            user_id int DEFAULT NULL,
+            warehouse_id int DEFAULT NULL,
+            total DECIMAL(20,2) DEFAULT 0.00,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            deleted_at TIMESTAMP NULL
+        );`,
+        "childs" : {
+          "table" : "selling_details",
+          "fields" : ["product_id","quantity","price","amount","selling_id"],    
+          "datas" : [
+            [1,1,5000,5000,1],                 
+            [2,1,5000,5000,1],                 
+            [1,2,10000,10000,2],
+            [2,2,10000,10000,2]
+          ],
+          "sqlTable" : `CREATE TABLE selling_details (
+              id int NOT NULL AUTO_INCREMENT PRIMARY KEY,
+              selling_id int DEFAULT NULL,
+              product_id int DEFAULT NULL,              
+              quantity DECIMAL(20,2) DEFAULT 0.00,
+              price DECIMAL(20,2) DEFAULT 0.00,
+              amount DECIMAL(20,2) DEFAULT 0.00
+          );`,
+        }
+      }    
     ]
 
   const dynamicPool = new DynamicPool(4,{
