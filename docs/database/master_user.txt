@@ -9,9 +9,3 @@ nama
 
 email
  // string 50 unique
-
-created_at
- // timestamp
-
-updated_at 
- // timestamp

@@ -1,6 +1,9 @@
 id  
   //  bigInt usigned 
 
+code 
+  // string 50 unique 
+  
 name 
   // string 50
   
