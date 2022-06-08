@@ -250,8 +250,13 @@ try{
 
             // console.log(newData);
 
+            
             let dataModel = mongoose.models[data.table] || mongoose.model(data.table,data.mongodb_model);
-        
+
+            let dataPast = await dataModel.findOne({ 'id': newData.id });
+
+            console.log(dataPast);
+
             let insertData = new dataModel(newData);
 
             let resultInsert = await insertData.save();
