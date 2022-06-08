@@ -1,5 +1,5 @@
 // import { DynamicPool } from 'node-worker-threads-pool';
-import mongoose, { mongo } from "mongoose";
+import mongoose from "mongoose";
 import mysql from 'mysql2/promise';
 
 try{
@@ -39,6 +39,16 @@ try{
                         "quantity",
                         "price",
                         "amount"
+                    ],
+                    "relasionals" : [
+                        {
+                            "many" : false,
+                            "table" : "products",
+                            "filed" : "product_id",
+                            "filed_relasional" : "id",
+                            "column" : "product",
+                            "keys" : ["id","name"]
+                        },
                     ]
                 }
             ],
@@ -53,10 +63,10 @@ try{
                 },
                 "user_id" : {
                     type : Number,
-                    default : null 
+                    default : null
                 },
 
-                "supplier" : {
+                "supplier" : {                    
                     type : {
                         "id" : {
                             type:  Number,
@@ -67,8 +77,9 @@ try{
                             default : null 
                         }
                     },
-                    default : null 
+                    default : null
                 },
+
                 "user" : {
                     type : {
                         "id" : {
@@ -80,58 +91,58 @@ try{
                             default : null 
                         }
                     },
-                    default : null 
+                    default : null
                 },
 
                 "purchaseing_details" : {
-                        type : [
+                    type : [
                             // TYPE DEFAULT ARRAY
                             {
-                            "id" : {
-                                type : Number,
-                                defualt : null 
-                            },
-                            "purchaseing_id" : {
-                                type : Number,
-                                defualt : null                            
-                            },
-                            "product_id" : {
-                                type : Number,
-                                default : null
-                            },
-                            "product" : {
-                                type : {
-                                    "id" : {
-                                        type : Number,
-                                        default : null 
-                                    },
-                                    "name" : {
-                                        type : String,
-                                        defualt : null 
-                                    } 
+                                "id" : {
+                                    type : Number,
+                                    defualt : null 
                                 },
-                                default : null 
-                            },                        
-                            "quantity" : {
-                                type : mongoose.Decimal128,
-                                default : 0.00
-                            },
-                            "price" : {
-                                type : mongoose.Decimal128,
-                                default : 0.00
-                            },
-                            "amount" : {
-                                type : mongoose.Decimal128,
-                                default : 0.00
+                                "purchaseing_id" : {
+                                    type : Number,
+                                    defualt : null                             
+                                },
+                                "product_id" : {
+                                    type : Number,
+                                    default : null 
+                                },
+                                "product" : {
+                                    type : {
+                                        "id" : {
+                                            type : Number,
+                                            default : null
+                                        },
+                                        "name" : {
+                                            type : String,
+                                            defualt : null  
+                                        } 
+                                    },
+                                    default : null
+                                },                        
+                                "quantity" : {
+                                    type : mongoose.Decimal128,
+                                    default : 0.00
+                                },
+                                "price" : {
+                                    type : mongoose.Decimal128,
+                                    default : 0.00
+                                },
+                                "amount" : {
+                                    type : mongoose.Decimal128,
+                                    default : 0.00
+                                }
                             }
-                        }
                     ],
                     defualt : []
                 },
 
                 "code" : {
                     type : String,
-                    default : null 
+                    default : null
                 },
                 "total" : {
                     type : mongoose.Decimal128,
@@ -164,19 +175,16 @@ try{
 
     console.log("Connect Mysql Success");
 
-    await mongoose.connect(`mongodb://localhost:27017/testing_db_backup`,{         
-        authSource : "admin",        
+    // MAYBE YOU NEED CREATE DATABASE FIRST
+    await mongoose.connect(`mongodb://localhost:27017/test`,{         
+        // authSource : "admin",        
         // user : process.env.DB_USERNAME,
         // pass : process.env.DB_PASSWORD,        
-        useNewUrlParser: true,
-        useUnifiedTopology: true
+        // useNewUrlParser: true,
+        // useUnifiedTopology: true
     });
 
     console.log("Success Mongodb Conn");
-
-
-    // const Cat = mongoose.model('Cat', { name: String });
-
 
     for (const [index,data] of datas.entries()) {  
         // CHECKING IF THERE IS DATA EXISTS
@@ -201,36 +209,56 @@ try{
 
             // QUERY TO RELASIONAL
             for(const [indexRelasional,dataRealasional] of data.relasionals.entries()){
-                if(
-                    dataRealasional.filed in dataRow && 
-                    dataRealasional.many === false
-                ){
-                    let selectFields = dataRealasional.keys.join(",");
+                let isMany = dataRealasional.many === true;        
 
-                    let [rowRelasionals,fieldRelasional] = await connection.execute(`
-                        SELECT ${selectFields} FROM ${dataRealasional.table} 
-                        WHERE ${dataRealasional.filed_relasional}=${dataRow[dataRealasional.filed]} limit 1
-                    `);
-                    
-                    newData[dataRealasional.column] = rowRelasionals.length 
-                        ? rowRelasionals[0] 
-                        : null;                    
-                }else{
-                    let selectFields = dataRealasional.keys.join(",");
+                let selectFields = dataRealasional.keys.join(",");
                 
-                    let [rowRelasionals,fieldRelasional] = await connection.execute(`
-                        SELECT ${selectFields} FROM ${dataRealasional.table} 
-                        WHERE ${dataRealasional.filed_relasional}=${dataRow[dataRealasional.filed]}
-                    `);
+                let query = `
+                    SELECT ${selectFields} FROM ${dataRealasional.table} 
+                    WHERE ${dataRealasional.filed_relasional}=${dataRow[dataRealasional.filed]} ${!isMany ? 'limit 1' : ''}
+                `;        
+
+                let [rowRelasionals,fieldRelasional] = await connection.execute(query);
+
+                if(dataRealasional.relasionals){
+                    for(const [indexRowRelasional,dataRowRealasional] of rowRelasionals.entries()){
+                        for(const [indexChildRelasional,dataChildRelasional] of dataRealasional.relasionals.entries()){
+                            // JUST FOR ONE NOT MANY
+
+                            let selectChildFields = dataChildRelasional.keys.join(",");
+
+                            let [rowChildRelasionals,fieldChildRelasional] = await connection.execute(`
+                                SELECT ${selectChildFields} FROM ${dataChildRelasional.table} 
+                                WHERE ${dataChildRelasional.filed_relasional}=${dataRowRealasional[dataChildRelasional.filed]} limit 1
+                            `);
                     
-                    newData[dataRealasional.column] = rowRelasionals.length     
-                        ? rowRelasionals
-                        : []; 
-                }
+                            rowRelasionals[indexRowRelasional][dataChildRelasional.column] = rowChildRelasionals.length 
+                                ? rowChildRelasionals[0] 
+                                : null;      
+                        }
+                    }
+                }                
+
+                newData[dataRealasional.column] = !isMany 
+                        ? (rowRelasionals.length 
+                            ? rowRelasionals[0] 
+                            : null ) 
+                        : rowRelasionals;                              
             }
 
             // INSERT IN MONGODB 
-            console.log(newData);
+
+            // console.log(newData);
+
+            let dataModel = mongoose.models[data.table] || mongoose.model(data.table,data.mongodb_model);
+        
+            let insertData = new dataModel(newData);
+
+            let resultInsert = await insertData.save();
+
+            if(resultInsert){
+                console.log('DONE INSERT');
+            }            
 
             // DELETE DATA
             let [result] = await connection.execute(`
@@ -238,14 +266,14 @@ try{
             `)            
             
             if(result.affectedRows){
-                console.log("Delete Success");
+                // console.log("Delete Success");
             }else{
-                console.log("Delete Failed");
+                // console.log("Delete Failed");
             }
         }
     }
 
-    
+    process.exit();      
 }catch(err){
     console.log("Failed : " + err.message);
     process.exit();      
