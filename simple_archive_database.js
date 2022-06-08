@@ -258,7 +258,10 @@ try{
 
             if(resultInsert){
                 console.log('DONE INSERT');
-            }            
+            }else{
+                break;
+                process.exit();      
+            }
 
             // DELETE DATA
             let [result] = await connection.execute(`
@@ -268,6 +271,8 @@ try{
             if(result.affectedRows){
                 // console.log("Delete Success");
             }else{
+                break;
+                process.exit();      
                 // console.log("Delete Failed");
             }
         }
